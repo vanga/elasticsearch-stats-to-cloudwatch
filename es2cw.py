@@ -1,12 +1,19 @@
-#!/bin/python
+#!/usr/bin/python
 from boto.ec2 import cloudwatch
 import json
-
-region = "us-west-1"
-ES_HOST = "localhost"
+import yaml
+import sys
 ## elasticsearch
 from elasticsearch import Elasticsearch
 
+for arg in sys.argv:
+    env = arg
+
+with open("config/" + env +".yml", 'r') as config_file:
+    config = yaml.load(config_file)
+
+ES_HOST = config['elasticsearch']['host']
+ES_PORT = config['elasticsearch']['port']
 aws = {}
 aws["region"] = "us-west-1"
 
@@ -77,7 +84,7 @@ body = {
 
 
 def get_metric_data():
-	es = Elasticsearch([{'host' : ES_HOST, 'port' : 9200}])
+	es = Elasticsearch([{'host' : ES_HOST, 'port' : ES_PORT}])
 	res = es.search(
 		index = ".marvel-*",
 		body = body)
